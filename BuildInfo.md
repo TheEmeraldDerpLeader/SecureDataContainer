@@ -21,22 +21,22 @@ All source files are in the same folder
 No extra include directories
 
 ### Example Config
-For a project in Visual Studio with the following file structure:
-	(SolutionDir)
-		Depends
-			7Zip
-				(7Zip install)
-		(ProjectName)
-			7Zip
-				(7Zip install)
-			Source
-		x64
-			Debug
-				(output exe)
-				7Zip
-					(7Zip install)
-			Release
-				(similar to Debug)
+For a project in Visual Studio with the following file structure:<br>
+- (SolutionDir)
+	- Depends
+		- 7Zip
+			- (7Zip install)
+	- (ProjectName)
+		- 7Zip
+			- (7Zip install)
+		- Source
+	- x64
+		- Debug
+			- (output exe)
+			- 7Zip
+				- (7Zip install)
+		- Release
+			- (similar to Debug)
 
 Add this line to Project Properties BuildEvents => Post-Build Event => Command Line
 
