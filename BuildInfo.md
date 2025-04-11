@@ -22,21 +22,21 @@ No extra include directories
 
 ### Example Config
 For a project in Visual Studio with the following file structure:<br>
-	(SolutionDir)<br>
-		Depends<br>
-			7Zip<br>
-				(7Zip install)<br>
-		(ProjectName)<br>
-			7Zip<br>
-				(7Zip install)<br>
-			Source<br>
-		x64<br>
-			Debug<br>
-				(output exe)<br>
-				7Zip<br>
-					(7Zip install)<br>
-			Release<br>
-				(similar to Debug)<br>
+- (SolutionDir)
+	- Depends
+		- 7Zip
+			- (7Zip install)
+	- (ProjectName)
+		- 7Zip
+			- (7Zip install)
+		- Source
+	- x64
+		- Debug
+			- (output exe)
+			- 7Zip
+				- (7Zip install)
+		- Release
+			- (similar to Debug)
 
 Add this line to Project Properties BuildEvents => Post-Build Event => Command Line
 
