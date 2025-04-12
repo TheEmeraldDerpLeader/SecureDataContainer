@@ -22,5 +22,7 @@ actual layout of the archive
 class AccessControlMatrix
 {
 public:
+	void AddFile(int permission, std::string& filePath);
+
 
 };
