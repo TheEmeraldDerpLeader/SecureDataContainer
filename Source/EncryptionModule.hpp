@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iostream>
-
+#include <vector>
+#include "AccessControlMatrix.hpp"
 /*
 //EncryptionModule
 - Description:
@@ -22,5 +23,14 @@
 class EncryptionModule
 {
 public:
+	
+	//---error handling can be done within these functions, or you can return an error int and let me know to add error handling on the SDCSoftware side for that
+	
+	//archiveName is just a simple string file for the name. Could be a path.
+	void TryCreateArchive(std::string archiveName);
 
+	void EncryptAndAddFiles(AccessControlMatrix& acm);
+
+	//accessKeysOut is a 4 element vector of strings. The first string should be set to the admin's access key, second is privleged user, etc...
+	void EncryptAndAddACM(AccessControlMatrix& acm, std::vector<std::string>& accessKeysOut);
 };
