@@ -17,7 +17,16 @@ void EncryptionModule::CreateArchiveAndAddACM(AccessControlMatrix& acm, std::vec
 	accessKeysOut = acm.csvKeys;
 	std::cout.flush(); //so system calls don't get shown before cout buffer
 
+#ifndef NOT_WINDOWS
+#define WINDOWS
+#endif
+
+#ifdef WINDOWS
 	std::string commandStart = "7Zip\\7z a -t7z \""; commandStart += archiveName; commandStart += '"';
+#endif
+#ifdef NOT_WINDOWS
+	std::string commandStart = "7Zip/7zz a -t7z \""; commandStart += archiveName; commandStart += '"';
+#endif
 
 	//command to be executed, calling 7zip to add and encrypt the files
 	std::string command;
