@@ -3,7 +3,9 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-//true random number generation
+#include <vector>
+#include <random>
+#include <cstdio>
 
 /*
 //AccessControlMatrix
@@ -19,10 +21,56 @@ actual layout of the archive
 /Generate csv files to be added to archive
 /Generate keys for the role permissions and files (must be true random keys)
 */
+
+class FileEntry
+{
+public:
+	std::string filePath;
+	std::string fileName;
+	int access = 0; //0 = admin, 1 = privleged user, 2 = user, 3 = guest
+	std::string key;
+
+	FileEntry() {}
+	FileEntry(std::string filePathString, int accessInt, std::string keyString) : filePath(filePathString), access(accessInt), key(keyString)
+	{
+		//get last name in file path
+		for (int i = filePath.size()-1; i >= 0; i--)
+		{
+			if (filePath[i] == '/' || filePath[i] == '\\')
+				break;;
+			fileName.push_back(filePath[i]);
+		}
+
+		//reverse order
+		int j = fileName.size()-1;
+		for (int i = 0; i < fileName.size(); i++)
+		{
+			if (i >= j) //lazy way
+				break;
+			char hold = fileName[i];
+			fileName[i] = fileName[j];
+			fileName[j] = hold;
+			j--;
+		}
+	}
+};
+
+int randI(int firstInt, int secondInt, std::mt19937& rng); ///inclusive
+
 class AccessControlMatrix
 {
 public:
-	void AddFile(int permission, std::string& filePath);
+	std::vector<FileEntry> files;
+	std::vector<std::string> csvKeys;
 
+	std::mt19937 rng;
 
+	std::string GenerateKey();
+
+	AccessControlMatrix();
+
+	void GenerateCSVFiles();
+	void DeleteCSVFiles();
+
+	void AddFile(int accessLevel, std::string& filePath);
 };

@@ -134,7 +134,7 @@ Use command Stop to stop adding files
 				}
 
 				//Add file to ACM
-				//acm.AddFile(currentAccess, word); //maybe return an error code, but could very well just have acm class print stuff out instead
+				acm.AddFile(currentAccess, word); //maybe return an error code, but could very well just have acm class print stuff out instead
 				std::cout << "Added File: " << word << " with access " << currentAccess << '\n';
 
 				i = j;
@@ -215,16 +215,9 @@ int SDCSoftware::GenerateArchive()
 	std::vector<std::string> accessKeys;
 	accessKeys.resize(4);
 
-	//testing
-	accessKeys[0] = "AABB";
-	accessKeys[1] = "ABCD";
-	accessKeys[2] = "ADBC";
-	accessKeys[3] = "DCBA";
-
 	EncryptionModule em;
-	//em.TryCreateArchive(name);
-	//em.EncryptAndAddFiles(acm);
-	//em.EncryptAndAddACM(acm, accessKeys);
+	em.TryCreateArchive(name);
+	em.CreateArchiveAndAddACM(acm, accessKeys);
 
 	std::cout << "Archive Created!\n";
 	std::cout << "Admin access key: " << accessKeys[0] << '\n';

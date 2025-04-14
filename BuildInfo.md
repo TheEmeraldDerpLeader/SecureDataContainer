@@ -13,7 +13,7 @@ The code in this project should follow C++14 standards, though might not necessa
 ## Build Configuration
 This project's library dependencies is solely std. Not sure what version or whatever, but it's probably fine.
 
-Additionally, this project requires the [7-Zip](https://www.7-zip.org) executable to be stored near the built executable. The exact path relative to the .exe is TBD. For simplicity, this should be the entire console executable which is downloaded from [here](https://www.7-zip.org/download.html) using the entries marked 64-bit. The latest version at this document's time was 24.09.
+Additionally, this project requires the [7-Zip](https://www.7-zip.org) executable to be stored near the built executable. Specifically, 7Zip needs to be stored with the built executable at ./7Zip/(7Zip install). The console executable which is downloaded from [here](https://www.7-zip.org/download.html) using the entries marked 64-bit. Probably only 7z.exe and 7z.dll need to be stored for it to work. The latest version at this document's time was 24.09.
 
 ## Source File Structure
 All source files are in the same folder
@@ -26,6 +26,9 @@ For a project in Visual Studio with the following file structure:<br>
 	- Depends
 		- 7Zip
 			- (7Zip install)
+			- 7z.exe
+			- 7z.dll
+			- (other files, like the license)
 	- (ProjectName)
 		- 7Zip
 			- (7Zip install)
@@ -35,6 +38,9 @@ For a project in Visual Studio with the following file structure:<br>
 			- (output exe)
 			- 7Zip
 				- (7Zip install)
+				- 7z.exe
+				- 7z.dll
+				- (other files, like the license)
 		- Release
 			- (similar to Debug)
 

@@ -1,66 +1,84 @@
 #include "EncryptionModule.hpp"
 
-#include <filesystem>
-#include <cstdlib> // for system()
-#include <fstream>
-#include <random>
+void EncryptionModule::TryCreateArchive(std::string archiveNameString)
+{
+	archiveName = archiveNameString;
+	std::cout << "Trying to create an archive" << archiveName << '\n';
+	std::cout.flush(); //so system calls don't get shown before cout buffer
 
-void EncryptionModule::TryCreateArchive(std::string archiveName) {
-    // Check if 7z is usable
-    int check = system("7z >nul 2>&1");
-    // MacOS/Linux: system("7z > /dev/null 2>&1");
-    if (check != 0) {
-        std::cerr << "7-Zip is not installed or not in PATH.\n";
-        return;
-    }
+	std::remove(archiveName.c_str()); //ignore error
 
-    // Check if archive already exists
-    if (std::filesystem::exists(archiveName)) {
-        std::cerr << "Archive \"" << archiveName << "\" already exists.\n";
-        return;
-    }
-
-    // Create an empty archive as a test
-    std::string command = "7z a \"" + archiveName + "\" -mx=0 >nul";
-    int result = system(command.c_str());
-    if (result == 0)
-        std::cout << "Archive created: " << archiveName << "\n";
-    else
-        std::cerr << "Failed to create archive: " << archiveName << "\n";
+	//no command line option to just create an archive. For simplicity, just don't make one here
 }
 
-void EncryptionModule::EncryptAndAddFiles(AccessControlMatrix& acm) {
-    // Since ACM provides no file accessors, simulate what we'd do:
-    std::cerr << "[EncryptAndAddFiles] No file list in ACM. This function requires ACM to expose file data.\n";
-    // Example:
-    // for (const auto& file : acm.GetFiles())
-    //     Encrypt file with acm.GetEncryptionKey(file)
-}
+void EncryptionModule::CreateArchiveAndAddACM(AccessControlMatrix& acm, std::vector<std::string>& accessKeysOut)
+{
+	acm.GenerateCSVFiles();
+	accessKeysOut = acm.csvKeys;
+	std::cout.flush(); //so system calls don't get shown before cout buffer
 
-void EncryptionModule::EncryptAndAddACM(AccessControlMatrix& acm, std::vector<std::string>& accessKeysOut) {
-    // Again, AccessControlMatrix has no method to generate or expose the keys or save them
-    // We’ll stub this out as a placeholder for future implementation
+	std::string commandStart = "7Zip\\7z a -t7z \""; commandStart += archiveName; commandStart += '"';
 
-    std::cerr << "[EncryptAndAddACM] ACM does not support exporting keys or structure yet.\n";
+	//command to be executed, calling 7zip to add and encrypt the files
+	std::string command;
 
-    // Simulate true random key generation for four roles
-    const int keyLength = 16;
-    const std::string charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(0, charset.size() - 1);
+	//add csvFiles to directory
 
-    accessKeysOut.clear();
-    for (int i = 0; i < 4; ++i) {
-        std::string key;
-        for (int j = 0; j < keyLength; ++j)
-            key += charset[dist(gen)];
-        accessKeysOut.push_back(key);
-    }
+	//admnKeys.csv
+	command = commandStart;  command += " \""; command += "__adminKeys.csv"; command += '"';
+	//add password to file
+	command += " -p"; command += acm.csvKeys[0];
+	//redirect output to nul
+	command += " > nul";
+	std::system(command.c_str());
+	
+	//admnKeys.csv
+	command = commandStart;  command += " \""; command += "__privUserKeys.csv"; command += '"';
+	command += " -p"; command += acm.csvKeys[1];
+	command += " > nul";
+	std::system(command.c_str());
 
-    std::cout << "Generated random keys for 4 roles (Admin, Privileged, User, Guest):\n";
-    for (int i = 0; i < 4; ++i)
-        std::cout << "Key " << i << ": " << accessKeysOut[i] << "\n";
+	//admnKeys.csv
+	command = commandStart;  command += " \""; command += "__userKeys.csv"; command += '"';
+	command += " -p"; command += acm.csvKeys[2];
+	command += " > nul";
+	std::system(command.c_str());
 
-    // You might also write these keys to a temporary CSV and encrypt that, but ACM doesn't allow export.
+	//admnKeys.csv
+	command = commandStart;  command += " \""; command += "__guestKeys.csv"; command += '"';
+	command += " -p"; command += acm.csvKeys[3];
+	command += " > nul";
+	std::system(command.c_str());
+
+	acm.DeleteCSVFiles();
+
+	std::vector<std::string> failedFiles;
+
+	//Add and encrypt files to archive
+	for (int i = 0; i < acm.files.size(); i++)
+	{
+		command = commandStart;  command += " \""; command += acm.files[i].filePath; command += '"';
+		//add password to file
+		command += " -p"; command += acm.files[i].key;
+		//redirect output to nul
+		command += " > nul";
+		int error = std::system(command.c_str());
+		if (error != 0)
+		{
+			failedFiles.push_back(acm.files[i].filePath);
+		}
+	}
+
+	//warn user of files which couldn't be added
+	if (failedFiles.size() > 0)
+	{
+		std::cout << "Warning: the following files couldn't be added to the archive:\n";
+		for (int i = 0; i < failedFiles.size(); i++)
+			std::cout << failedFiles[i] << '\n';
+		std::cout << '\n';
+	}
+	else
+	{
+		std::cout << "\nSuccessfully created an archive from all files!\n";
+	}
 }

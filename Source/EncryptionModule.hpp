@@ -2,7 +2,10 @@
 
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <cstdio>
 #include "AccessControlMatrix.hpp"
+
 /*
 //EncryptionModule
 - Description:
@@ -18,19 +21,16 @@
 /7zip csvs from an ACM object
 
 - Other Notes:
-/Singleton? It's literally got module in the name
+/https://documentation.help/7-Zip/index5.htm
 */
+
 class EncryptionModule
 {
 public:
-	
-	//---error handling can be done within these functions, or you can return an error int and let me know to add error handling on the SDCSoftware side for that
-	
+	std::string archiveName;	
 	//archiveName is just a simple string file for the name. Could be a path.
-	void TryCreateArchive(std::string archiveName);
-
-	void EncryptAndAddFiles(AccessControlMatrix& acm);
+	void TryCreateArchive(std::string archiveNameString);
 
 	//accessKeysOut is a 4 element vector of strings. The first string should be set to the admin's access key, second is privleged user, etc...
-	void EncryptAndAddACM(AccessControlMatrix& acm, std::vector<std::string>& accessKeysOut);
+	void CreateArchiveAndAddACM(AccessControlMatrix& acm, std::vector<std::string>& accessKeysOut);
 };

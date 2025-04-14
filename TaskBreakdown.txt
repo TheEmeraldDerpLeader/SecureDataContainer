@@ -1,73 +1,11 @@
 Task/Feature Breakdown:
 
 //SDCSoftware
-	- Description:
-		/Manages the view in MVC for the entire application
-		/Implement user flow based on the sequence diagram and activity diagram here
-	
 	- Tasks:
-		/Explicitly layout the progression of the command line interface
-		through comments (see Other Notes).
 		/Query input from user. Non-exhaustive list of potential input (* optional):
 			Encryption related:
-			/file names to add to archive
-			/file permissions
 			*remove file from archive
 			*view current files in archive
-			/Generate archive (output keys)
 
 			Post-archive related:
 			*Extract files for a given user key
-
-		/Write preliminary response handling where possible
-		/Once other modules are finalized:
-			/Input processing
-			/Other response handling
-
-	- Other Notes:
-		/There are many ways we could implement this. I'd personally do a state machine approach
-
-//AccessControlMatrix
-	- Description:
-		/Stores the file structure of the archive
-		/Provides functions to add files, change access level, and everything else involving the
-		actual layout of the archive
-		/Has a function to generate the csv files for the physical ACM in the archive
-
-	- Tasks:
-		/Data structure to associate file names to file paths (pre-archive), access permission, and encryption keys
-		/Add files to this data structure
-		/Generate csv files to be added to archive
-		/Generate keys for the role permissions and files (must be true random keys)
-
-//EncryptionModule
-	- Description:
-		/Responsible for using 7zip to create the archive
-		/Reads from an AccessControlMatrix object to figure out what files to encrypt and such
-		/Checks for errors in ACM (e.g. an added file was later deleted from the OS)
-
-	- Tasks:
-		/Verify that 7Zip is usable
-		/Determine output name (what if output already exists?)
-		/7zip an individual file + key from an ACM object's file structure data
-		/7zip all files from an ACM object
-		/7zip csvs from an ACM object
-
-	- Other Notes:
-		/Singleton? It's literally got module in the name
-
-//FileManager
-	-std iostream is probably sufficient by itself
- 
- Notes:
-	- how to handle directories / subfolders?
-		/Could just not handle that, not a necessary feature nor something we discussed
-		in the documents. Either folders wouldn't be encrypted so the directory structures
-		can stay, or all files would lose their directory info
-		/To keep directory info, it would have to be stored in it's own encrypted files
-		/IMO best solution would to be to allow the user to determine which of the two simple solutions to use,
-		as this keeps in line with the requirement of being able to access the files solely through the 7zip UI
-		while allowing the user to determine if folder names are a security risk
-		/Or maybe just do the no folder structure approach bc prof might dock points if we leave the folder structure and this is the
-		simplest option. It's just less user-friendly this way :(
-		
