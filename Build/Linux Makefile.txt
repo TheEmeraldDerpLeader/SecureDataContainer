@@ -1,9 +1,7 @@
-NOT_WINDOWS :=
-
 #super cool makefile template by Themeralderp
 #thought I had a variant with library specification but couldn't find it
 
-WARNFLAGS := -Wall -Werror -Wno-unused-but-set-variable -Wno-unused-variable -Wno-misleading-indentation -Wno-sign-compare -Wno-unused-function -Wno-comment
+WARNFLAGS := -Wall -Werror -Wno-unused-but-set-variable -Wno-unused-variable -Wno-misleading-indentation -Wno-sign-compare -Wno-unused-function -Wno-comment -DNOT_WINDOWS
 PNAMES := AccessControlMatrix EncryptionModule SDCSoftware Program
 PONAMES := $(foreach prog, $(PNAMES), $(prog).o)
 .SUFFIXES:
