@@ -86,6 +86,8 @@ void SDCSoftware::AddFile() //may want to add local directory stuff commands so 
 	std::cout << R"(Add files and their access levels here. Use the following format:
 {Admin / PrivUser / User / Guest} "file1" "file2" etc...
 
+A file can be assigned multiple access levels by using {Access1}&{Access2}, e.g. PrivUser&User "file"
+
 The first word should be a access level specifier. When files are added, they use the latest access specifier. If no access level is specified when adding a file, the input command will error and nothing will be added.
 Use command Stop to stop adding files
 
@@ -101,11 +103,13 @@ Use command Stop to stop adding files
 		std::getline(std::cin, input);
 
 		std::string word;
-		int currentAccess = -1; //-1 = invalid, 0 = admin, 1 = privleged user, 2 = user, 3 = guest
+		int currentAccess = -1; //-1 = invalid
+		bool anotherAccess = false; //when the user specifies multiple access levels with &
 		
 		input.push_back(' '); //handle final word at end of string
 		for (int i = 0; i < input.size(); i++)
 		{
+			
 			if (input[i] == ' ' && word.size() == 0) //skip over starting whitespace
 				continue;
 
@@ -135,39 +139,57 @@ Use command Stop to stop adding files
 
 				//Add file to ACM
 				acm.AddFile(currentAccess, word); //maybe return an error code, but could very well just have acm class print stuff out instead
-				std::cout << "Added File: " << word << " with access " << currentAccess << '\n';
+				std::cout << "Added File: " << word << '\n';
 
 				i = j;
 				word.clear();
+				continue;
 			}
 
 
-			else if (input[i] != ' ') //gradually create nonfile word
-				word.push_back(input[i]);
+			if (input[i] != ' ') //gradually create nonfile word
+			{
+				if (input[i] != '&')
+					word.push_back(input[i]);
+				else
+				{
+					if (anotherAccess == false)
+						currentAccess = 0; //reset access bc handle checks won't do it now
+					anotherAccess = true;
+				}
+			}
 
 			//Handle word
-			else if (input[i] == ' ')
+			if (input[i] == ' ' || input[i] == '&')
 			{
 				bool validWord = false;
 				ToLower(word);
 				if (word == "admin")
 				{
-					currentAccess = 0;
+					if (anotherAccess == false) //need to reset current access bc & check didn't run
+						currentAccess = 0;
+					//currentAccess |= SDC_ADMIN;
 					validWord = true;
 				}
 				else if (word == "privuser")
 				{
-					currentAccess = 1;
+					if (anotherAccess == false) //need to reset current access bc & check didn't run
+						currentAccess = 0;
+					currentAccess |= SDC_PRIVUSER;
 					validWord = true;
 				}
 				else if (word == "user")
 				{
-					currentAccess = 2;
+					if (anotherAccess == false) //need to reset current access bc & check didn't run
+						currentAccess = 0;
+					currentAccess |= SDC_USER;
 					validWord = true;
 				}
 				else if (word == "guest")
 				{
-					currentAccess = 3;
+					if (anotherAccess == false) //need to reset current access bc & check didn't run
+						currentAccess = 0;
+					currentAccess |= SDC_GUEST;
 					validWord = true;
 				}
 				if (word == "stop")
@@ -178,6 +200,8 @@ Use command Stop to stop adding files
 
 				word.clear();
 					
+				if (input[i] == ' ') //end of access chain, reset anotherAccess
+					anotherAccess = false;
 			}
 		}
 	}
@@ -206,7 +230,17 @@ int SDCSoftware::GenerateArchive()
 		std::cout << "Is \"" << name << "\" a good name for the archive? Y or N:";
 		std::string input;
 		std::getline(std::cin, input);
-		if (input.size() > 0 && (input[0] == 'Y' || input[0] == 'y'))
+
+		bool isY = false;
+		for (int i = 0; i < input.size(); i++)
+		{
+			if (input[i] == 'Y' || input[i] == 'y')
+			{
+				isY = true;
+				break;
+			}
+		}
+		if (isY == true)
 			break;
 		else
 			std::cout << "Specify a new archive name: ";
@@ -219,7 +253,6 @@ int SDCSoftware::GenerateArchive()
 	em.TryCreateArchive(name);
 	em.CreateArchiveAndAddACM(acm, accessKeys);
 
-	std::cout << "Archive Created!\n";
 	std::cout << "Admin access key: " << accessKeys[0] << '\n';
 	std::cout << "Privleged User access key: " << accessKeys[1] << '\n';
 	std::cout << "User access key: " << accessKeys[2] << '\n';

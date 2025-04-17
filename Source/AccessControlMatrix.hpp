@@ -22,6 +22,12 @@ actual layout of the archive
 /Generate keys for the role permissions and files (must be true random keys)
 */
 
+//access level bit flags, admin access is implied
+#define SDC_ADMIN 0
+#define SDC_PRIVUSER 1
+#define SDC_USER 2
+#define SDC_GUEST 4
+
 class FileEntry
 {
 public:

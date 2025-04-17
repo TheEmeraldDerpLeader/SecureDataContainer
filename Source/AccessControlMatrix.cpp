@@ -1,3 +1,7 @@
+#ifndef NOT_WINDOWS
+#define WINDOWS
+#endif
+
 #include "AccessControlMatrix.hpp"
 
 #include <ctime> //better to do this where possible, for simplicity not doing it tho
@@ -26,7 +30,15 @@ int randI(int firstInt, int secondInt, std::mt19937& rng) ///inclusive
 
 void AccessControlMatrix::AddFile(int accessLevel, std::string& filePath)
 {
-	
+	//files starting with ./ won't get put in subfolders for the archive, so remove ./ if possible
+	if (filePath.size() >= 2 && filePath[0] == '.' && (filePath[1] == '/' || filePath[1] == '\\'))
+	{
+		//remove first two characters
+		for (int i = 0; i < filePath.size()-2; i++)
+			filePath[i] = filePath[i+2];
+		filePath.resize(filePath.size()-2);
+	}
+
 	files.push_back(FileEntry(filePath, accessLevel, GenerateKey()));
 }
 
@@ -71,10 +83,29 @@ void AccessControlMatrix::GenerateCSVFiles()
 	//Fill out csvs by iterating through all files
 	for (int i = 0; i < files.size(); i++)
 	{
+		std::string* effectiveFileLocation = &(files[i].filePath);
+
+		//check if filepath is an absolute file paths
+#ifdef WINDOWS
+		if (files[i].filePath.size() >= 2 && files[i].filePath[1] == ':') //check if path starts at a drive
+#endif
+#ifdef NOT_WINDOWS
+		if (files[i].filePath.size() >= 1 && files[i].filePath[0] == '/') //check if path starts with /
+#endif	
+			effectiveFileLocation = &(files[i].fileName); //7z handles absolute file paths by storing the file at the root of the archive
+
+		if (files[i].filePath.size() >= 3 && files[i].filePath[0] == '.' && files[i].filePath[1] == '.' && (files[i].filePath[2] == '/' || files[i].filePath[2] == '\\'))
+			effectiveFileLocation = &(files[i].fileName); //similar if file path goes outside of initial directory (probably true whenever ../ is used, even if not at start)
+
+
 		//admin can access all files
-		csvStreams[0] << '"' << files[i].filePath << "\"," << files[i].key << '\n';
-		if (files[i].access != 0)
-			csvStreams[files[i].access] << '"' << files[i].filePath << "\"," << files[i].key << '\n';
+		csvStreams[0] << '"' << *effectiveFileLocation << "\"," << files[i].key << '\n';
+		if ((files[i].access & SDC_PRIVUSER) != 0)
+			csvStreams[1] << '"' << *effectiveFileLocation << "\"," << files[i].key << '\n';
+		if ((files[i].access & SDC_USER) != 0)
+			csvStreams[2] << '"' << *effectiveFileLocation << "\"," << files[i].key << '\n';
+		if ((files[i].access & SDC_GUEST) != 0)
+			csvStreams[3] << '"' << *effectiveFileLocation << "\"," << files[i].key << '\n';
 		
 	}
 

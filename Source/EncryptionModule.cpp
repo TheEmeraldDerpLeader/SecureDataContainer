@@ -1,3 +1,7 @@
+#ifndef NOT_WINDOWS
+#define WINDOWS
+#endif
+
 #include "EncryptionModule.hpp"
 
 void EncryptionModule::TryCreateArchive(std::string archiveNameString)
@@ -16,10 +20,6 @@ void EncryptionModule::CreateArchiveAndAddACM(AccessControlMatrix& acm, std::vec
 	acm.GenerateCSVFiles();
 	accessKeysOut = acm.csvKeys;
 	std::cout.flush(); //so system calls don't get shown before cout buffer
-
-#ifndef NOT_WINDOWS
-#define WINDOWS
-#endif
 
 #ifdef WINDOWS
 	std::string commandStart = "7Zip\\7z a -t7z \""; commandStart += archiveName; commandStart += '"';
