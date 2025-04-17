@@ -2,7 +2,7 @@
  Project to create a 7zip archive with files that have different access permissions. Users can use a key specific to their access privilege to obtain access to specific files in the archive. This project streamlines the process of generating keys and the access control matrix for users to obtain the random file keys.
 
 ## User Information
- Release build executables are currently provided for Windows and Linux and can be obtained in the [release tab](https://github.com/TheEmeraldDerpLeader/SecureDataContainer/releases) on github. These builds also come with a copy of the command line executable for [7-Zip](https://www.7-zip.org), which is licensed under GNU LPGL, allowing us to package 7Zip with the release builds.
+ Release build executables are currently provided for Windows and x86 Linux for 64-bit systems and can be obtained in the [release tab](https://github.com/TheEmeraldDerpLeader/SecureDataContainer/releases) on github. These builds also come with a copy of the command line executable for [7-Zip](https://www.7-zip.org), which is licensed under GNU LPGL, allowing us to package 7Zip with the release builds.
  
   The executable, SecureDataContainer.exe, should be run by double clicking it and not through a command line because the software relies on the effective local directory being at the .exe file.
  

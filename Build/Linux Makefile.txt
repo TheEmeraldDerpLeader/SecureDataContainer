@@ -1,0 +1,29 @@
+NOT_WINDOWS :=
+
+#super cool makefile template by Themeralderp
+#thought I had a variant with library specification but couldn't find it
+
+WARNFLAGS := -Wall -Werror -Wno-unused-but-set-variable -Wno-unused-variable -Wno-misleading-indentation -Wno-sign-compare -Wno-unused-function -Wno-comment
+PNAMES := AccessControlMatrix EncryptionModule SDCSoftware Program
+PONAMES := $(foreach prog, $(PNAMES), $(prog).o)
+.SUFFIXES:
+
+INCLUDES := 
+
+test: $(PONAMES)
+	g++ $(WARNFLAGS) -std=c++14 -static -static-libstdc++ $(PONAMES) -o SecureDataContainer	
+
+define compileprog = 
+$(1).o: $(1).cpp
+	g++ $(WARNFLAGS) -std=c++14 -isystem . $(foreach dir, $(INCLUDES), -I $(dir)) $(1).cpp -c -o $(1).o
+endef
+
+$(foreach prog, $(PNAMES), $(eval $(call compileprog,$(prog))))
+
+define command =
+rm -f $(fname).o
+
+endef
+clean:
+	rm -f test.exe
+	$(foreach fname, $(PNAMES), $(command))
